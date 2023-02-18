@@ -1,0 +1,16 @@
+#apiVersion: telemetry.istio.io/v1alpha1
+#kind: Telemetry
+#metadata:
+#  name: mesh-default
+#  namespace: istio-system
+#spec:
+#  tracing:
+#  - randomSamplingPercentage: 50.00
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  meshConfig:
+    enableTracing: true
+    defaultConfig:
+      tracing:
+        sampling: 50

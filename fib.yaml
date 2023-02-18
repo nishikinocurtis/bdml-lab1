@@ -1,0 +1,51 @@
+# Fibonacci Calculator Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: fib
+  labels:
+    app: fib
+    service: fib
+spec:
+  ports:
+    - port: 3080
+      name: http
+  selector:
+    app: fib
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bdml-fib
+  labels:
+    account: fib
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fib-v1
+  labels:
+    app: fib
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fib
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: fib
+        version: v1
+    spec:
+      serviceAccountName: bdml-fib
+      containers:
+        - name: fib
+          image: fib_server:v1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3080
+          securityContext:
+            runAsUser: 1000
+---
