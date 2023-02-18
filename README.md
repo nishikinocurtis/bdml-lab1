@@ -110,11 +110,6 @@ kubectl delete -f jaeger.yaml
 
 And shutdown the minikube tunnel.
 
-## Performance
-
-To compare the impact of sampling rate on performance, 
-we can inspect it in two extreme scenario: 100% and 1%.
-
 
 
 

@@ -36,6 +36,8 @@ spec:
               value: "50000"
             - name: QUERY_BASE_PATH
               value: /jaeger
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
           livenessProbe:
             httpGet:
               path: /
@@ -113,5 +115,11 @@ spec:
   - port: 9411
     targetPort: 9411
     name: http-zipkin
+  - port: 4318
+    targetPort: 4318
+    name: otlp-collector-http
+  - port: 4317
+    targetPort: 4317
+    name: otlp-collector-grpc
   selector:
     app: jaeger

@@ -9,5 +9,6 @@
 
 namespace my_handlers {
     std::string fibonacci(std::string const& query_n);
+    std::int64_t times2(std::int64_t x);
 }
 
