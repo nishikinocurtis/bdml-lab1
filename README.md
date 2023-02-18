@@ -97,6 +97,10 @@ View Jaeger Dashboard again:
 collected for this round of requests. 
 That's acceptable around 50%.
 
+We can do more powerful trace after instrumenting codes.
+
+![power](spans.png)
+
 You may also dump a JSON file through the dashboard, view
 [the JSON file](example-trace-jaeger.json) to see what it looks like.
 
