@@ -3,7 +3,7 @@
 ## Background
 
 Since Jaeger officially deprecates their Thrift-base client and OpenTracing client, 
-and recommends users to switch to OpenTracing API, we need to use the OTLP exporter in 
+and recommends users to switch to OpenTelemetry API, we need to use the OTLP exporter in 
 the opentelemetry SDK.
 
 OTLP works on two modes: gRPC or HTTP, due to my personal preference I choose HTTP 
