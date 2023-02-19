@@ -48,4 +48,7 @@ spec:
             - containerPort: 3080
           securityContext:
             runAsUser: 1000
+          env:
+          - name: OTLP_HTTP_ENDPOINT
+            value: http://jaeger-collector.istio-system.svc:4318/v1/traces
 ---

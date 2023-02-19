@@ -1,10 +1,13 @@
 # NYU BDMLSys Lab1
 
-A simple C++ server calculating fibonacci numbers, to run in Istio Service Meshes.
+A simple C++ server calculating fibonacci numbers times 2, to run in Istio Service Meshes.
 
 ## Requirement
 
-To build the server, you need `boost` to be installed. The server uses `boost/beast` as the HTTP/TCP library.
+To build the server, you need `boost` and `opentelemetry` to be installed. 
+The server uses `boost/beast` as the HTTP/TCP library. And uses `opentelemetry/otlp/http` 
+as the exporter to send traces to jaeger (Jaeger Thrift 
+and OpenTracing API are deprecated as of early 2023).
 
 Istio and minikube installation are required.
 

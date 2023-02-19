@@ -25,6 +25,10 @@ using tcp = boost::asio::ip::tcp;
 using namespace opentelemetry::trace;
 namespace context = opentelemetry::context;
 
+const std::string b3_trace_id = "x-b3-traceid";
+const std::string b3_span_id  = "x-b3-spanid";
+const std::string b3_sampled  = "x-b3-sampled";
+
 
 class http_connection : public std::enable_shared_from_this<http_connection> {
 public:
@@ -71,21 +75,42 @@ private:
 
         std::map<std::string, std::string> request_headers;
         for (auto &hdr : request_.base()) {
-            request_headers.insert(
-                std::pair<std::string, std::string>(hdr.name_string(), hdr.value()));
+            if (hdr.name_string() == b3_span_id) {
+              request_headers.insert(
+                  std::pair<std::string, std::string>(propagation::kB3SpanIdHeader, hdr.value()));
+            } else if (hdr.name_string() == b3_trace_id) {
+              request_headers.insert(
+                  std::pair<std::string, std::string>(propagation::kB3TraceIdHeader, hdr.value()));
+            } else if (hdr.name_string() == b3_sampled) {
+              request_headers.insert(
+                  std::pair<std::string, std::string>(propagation::kB3SampledHeader, hdr.value()));
+            } else {
+              request_headers.insert(
+                  std::pair<std::string, std::string>(hdr.name_string(), hdr.value()));
+            }
         }
         const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(request_headers);
 
-        auto prop = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+        // auto prop = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+        // auto current_ctx = context::RuntimeContext::GetCurrent();
+        // auto new_ctx = prop->Extract(carrier, current_ctx);
+        auto prop =
+            context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
         auto current_ctx = context::RuntimeContext::GetCurrent();
         auto new_ctx = prop->Extract(carrier, current_ctx);
-        options.parent = GetSpan(new_ctx)->GetContext();
+
+        options.parent = new_ctx;
+        std::cerr << GetSpan(new_ctx)->GetContext().IsValid() << std::endl;
 
         auto span = get_tracer("fib_server")
             ->StartSpan(span_name, {
                 {SemanticConventions::kHttpMethod, std::string(request_.method_string())},
                 {SemanticConventions::kHttpScheme, "http"}
             }, options);
+        // auto span = GetSpan(new_ctx);
+//        std::cerr << span->GetContext().IsRemote()
+//                  << " "
+//                  << span->GetContext().IsSampled() << std::endl;
         auto scope = get_tracer("fib_server")->WithActiveSpan(span);
 
         span->SetAttribute("test-custom-attribute", "fib-server");
@@ -93,6 +118,11 @@ private:
 
         response_.version(request_.version());
         response_.keep_alive(false);
+
+        for (auto &item : request_.base()) {
+            span->SetAttribute("http.header." + std::string(item.name_string()),
+                               std::string(item.value()));
+        }
 
         switch(request_.method()) {
             case http::verb::get:
@@ -173,18 +203,14 @@ void http_server(tcp::acceptor& acceptor, tcp::socket& socket) {
 
 int main(int argc, char* argv[]) {
     try {
-        if(argc != 4) {
-            std::cerr << "Usage: " << argv[0] << " <address> <port> <jaeger-collector-address>\n";
+        if(argc != 3) {
+            std::cerr << "Usage: " << argv[0] << " <address> <port>\n";
             std::cerr << "Try: 0.0.0.0 80\n";
             return EXIT_FAILURE;
         }
 
-        std::stringstream ss;
-        ss << "http://" << argv[3] << ":4318/v1/traces";
 
-        std::cerr << "starting at" << argv[3] << std::endl;
-
-        opts.url = ss.str();
+        opts.url = std::getenv("OTLP_HTTP_ENDPOINT");
         InitTracer();
 
         auto const address = net::ip::make_address(argv[1]);

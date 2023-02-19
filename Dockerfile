@@ -7,4 +7,4 @@ COPY libprotobuf.so /usr/lib
 COPY libprotobuf.so.32 /usr/lib
 WORKDIR /home/fib
 
-CMD ["./lab_server", "0.0.0.0", "3080", "10.109.63.35"]
+CMD ["./lab_server", "0.0.0.0", "3080"]

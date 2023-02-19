@@ -12,6 +12,8 @@
 #include <opentelemetry/sdk/trace/samplers/parent.h>
 #include <opentelemetry/trace/provider.h>
 
+#include <opentelemetry/trace/propagation/b3_propagator.h>
+
 #include <opentelemetry/sdk/resource/resource.h>
 
 #include <opentelemetry/context/propagation/global_propagator.h>
@@ -27,6 +29,7 @@
 namespace otlp = opentelemetry::exporter::otlp;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace nostd = opentelemetry::nostd;
+namespace context = opentelemetry::context;
 
 namespace {
 template<typename T>
@@ -88,7 +91,7 @@ void InitTracer() {
 
     opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
         opentelemetry::nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
-            new opentelemetry::trace::propagation::HttpTraceContext()));
+            new opentelemetry::trace::propagation::B3Propagator()));
 }
 
 void CleanUpTracer() {
