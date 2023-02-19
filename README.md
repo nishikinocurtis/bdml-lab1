@@ -9,7 +9,9 @@ The server uses `boost/beast` as the HTTP/TCP library. And uses `opentelemetry/o
 as the exporter to send traces to jaeger (Jaeger Thrift 
 and OpenTracing API are deprecated as of early 2023).
 
-Istio and minikube installation are required.
+Istio and minikube installation are required. 
+Follow the [Set Up Guide](https://istio.io/latest/docs/setup/getting-started/)
+to do the installation.
 
 ## Usage
 
